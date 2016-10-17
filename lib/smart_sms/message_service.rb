@@ -90,8 +90,9 @@ module SmartSMS
         options[:code] ||= ''
         options[:company] ||= SmartSMS.config.company
         SmartSMS.config.template_value.map do |key|
+          next if options[key].nil?
           "##{key}#=#{options[key]}"
-        end.join('&')
+        end.compact.join('&')
       end
     end
   end
