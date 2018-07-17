@@ -18,7 +18,7 @@ module SmartSMS
       {
         'sid'               => SecureRandom.uuid,
         'mobile'            => mobile,
-        'send_time'         => Time.zone.now,
+        'send_time'         => Time.now,
         'text'              => "您的验证码是#{code}。如非本人操作，请忽略本短信【#{company}】",
         'send_status'       => 'SUCCESS',
         'report_status'     => 'UNKNOWN',
