@@ -2,8 +2,9 @@
 require 'spec_helper'
 
 describe 'SmartSMS::HasSmsVerification' do
-  let(:user) { User.create phone: '13764071479' }
-  let(:account) { Account.create mobile: '13764071479' }
+  let(:phone) { '13764071479' }
+  let(:user) { User.create phone: phone }
+  let(:account) { Account.create mobile: phone }
 
   context '#verify!' do
     let(:verification_code) { SmartSMS::VerificationCode.simple }
@@ -269,6 +270,55 @@ describe 'SmartSMS::HasSmsVerification' do
         it 'should be the same value for verified_at and confirmed_at' do
           expect(account.verified_at).to eq account.confirmed_at
         end
+      end
+    end
+  end
+
+  context '#deliver' do
+    context 'deliver with options' do
+      let(:url) { 'http://yunpian.com/v1/sms/tpl_send.json' }
+      let(:options) do
+        {
+          tpl_id: 1234567,
+          something: 8877654
+        }
+      end
+      before do
+        SmartSMS::VerificationCode.stub(:random).and_return("1234567890")
+        SmartSMS.stub(:find_by_sid).and_return({
+          'code' => 0,
+          'msg'  => 'OK',
+          'sms'  => {
+            'sid'               => '592762800',
+            'mobile'            => phone,
+            'send_time'         => '2014-05-08 09:24:08',
+            'text'              => 'some content',
+            'send_status'       => 'SUCCESS',
+            'report_status'     => 'SUCCESS',
+            'fee'               => 1,
+            'user_receive_time' => '2014-05-08 09:26:23',
+            'error_msg'         => nil
+          }
+        })
+        SmartSMS.stub(:deliver) do |number, text, opts|
+          expect(number).to eq(phone)
+          expect(text).to eq("1234567890")
+          expect(opts).to eq(options)
+
+          {
+            'code' => 0,
+            'msg'  => 'OK',
+            'result' => {
+              'count' => '1',
+              'fee'   => '1',
+              'sid'   => '592762800'
+            }
+          }
+        end
+      end
+
+      it 'should send with options' do
+        user.deliver nil, options
       end
     end
   end
