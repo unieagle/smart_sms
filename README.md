@@ -90,6 +90,8 @@ end
 # 发送短信验证码
 user.deliver # 将会生成一个随机的验证码发送至手机, 并保存在messages表中
 user.deliver '内容' # 可以发送指定内容至手机
+user.deliver nil, {tpl_id: 12345} # 将会生成一个随机的验证码发送至手机, 并保存在messages表中，用指定的tpl_id (12345)
+user.deliver '54321', {tpl_id: 12345} # 将验证码54321发送至手机, 并保存在messages表中，用指定的tpl_id (12345)
 
 # 查询历史短信记录
 user.messages
